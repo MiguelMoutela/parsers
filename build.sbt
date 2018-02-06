@@ -8,9 +8,7 @@ lazy val root = (project in file("."))
       )),
     name := "parser combinators",
     scalacOptions in Tut ~= filterConsoleScalacOptions,
-    scalacOptions += "-Ypartial-unification",
     libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.4" % "test",
     libraryDependencies += "org.scalacheck" %% "scalacheck" % "1.13.4" % "test",
-    libraryDependencies += "org.typelevel" % "cats-core_2.12" % "1.0.1",
-    libraryDependencies += "org.typelevel" % "cats-laws_2.12" % "1.0.1"
+    libraryDependencies += "org.typelevel" % "cats-core_2.12" % "1.0.1"
   )
