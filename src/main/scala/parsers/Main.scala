@@ -1,19 +1,13 @@
 package parsers
 
 import cats.implicits._
-import parsers.programs.Parsers
+import Arithmetic._
+import interpreters._
 
 object Main extends App {
-  import interpreters._
+  val expression = "((1)) * (2 + (((3))) * (4 + (((5)) + 6)) * (((7 * 8))) + 9)"
 
-  import Parsers._
+  val result = expr.run(expression)
 
-  val p = for {
-    x <- digit
-    _ <- anyChar
-    y <- digit
-  } yield s"$x$y"
-
-
-  println(string("ab").run("abc"))
+  println(result)
 }

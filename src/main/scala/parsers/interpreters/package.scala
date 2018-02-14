@@ -2,17 +2,20 @@ package parsers
 
 import cats.data.StateT
 import cats.implicits._
-import parsers.algebra.MonadState
+
+import scala.language.higherKinds
 
 package object interpreters {
   type Result[A] = Either[String, A]
-  type P[A] = StateT[Result, String, A]
+  type StateResult[A] = StateT[Result, String, A]
 
-  implicit val parser: MonadState[P, String] =
-    new MonadState[P, String] {
-      val get: P[String] = StateT.get[Result, String]
-
-      def modify(f: String => String): P[Unit] =
-        StateT.modify[Result, String](f)
+  implicit val parserInstance: Parser[StateResult] =
+    new Parser[StateResult] {
+      val anyChar: StateResult[Char] =
+        for {
+          input <- StateT.get[Result, String]
+          _ <- if (input.nonEmpty) StateT.modify[Result, String](_.tail)
+          else "Expected non-empty input, but input was empty.".raiseError[StateResult, Unit]
+        } yield input.head
     }
 }
