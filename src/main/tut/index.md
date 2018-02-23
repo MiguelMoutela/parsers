@@ -91,11 +91,7 @@ val space: Parser[Unit] =
   many(sat(_.isWhitespace)).map(_ => ())
 
 def token[A](p: Parser[A]): Parser[A] =
-  for {
-    _ <- space
-    v <- p
-    _ <- space
-  } yield v
+  space *> p <* space
 
 val identifier: Parser[String] = token(ident)
 val natural: Parser[Int] = token(nat)
