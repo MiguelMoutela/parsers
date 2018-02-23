@@ -35,9 +35,9 @@ val item: Parser[Char] =
 def sat(p: Char => Boolean): Parser[Char] =
   for {
     c <- item
-    res <- if (p(c)) c.pure[Parser]
+    _ <- if (p(c)) c.pure[Parser]
     else ().raiseError[Parser, Nothing]
-  } yield res
+  } yield c
 ```
 
 ```tut:silent
@@ -55,17 +55,8 @@ def char(c: Char): Parser[Char] = sat(_ == c)
 ```
 
 ```tut:silent
-object StringParser {  // needed for tut
-  def string(str: String): Parser[String] =
-    if (str.isEmpty) "".pure[Parser]
-    else
-      for {
-        _ <- char(str.head)
-        _ <- string(str.tail)
-      } yield str
-}
-
-import StringParser._
+def string(str: String): Parser[String] = 
+  str.map(char).toList.sequence.map(_.mkString)
 ```
 
 ```tut:book
@@ -91,20 +82,13 @@ import Many._
 
 ```tut:silent
 val ident: Parser[String] =
-  for {
-    x <- lower
-    xs <- many(alphaNum)
-  } yield (x :: xs).mkString
+  (lower, many(alphaNum)).mapN(_ :: _).map(_.mkString)
 
 val nat: Parser[Int] =
-  for {
-    xs <- many1(digit)
-  } yield xs.mkString.toInt
+  many1(digit).map(_.mkString.toInt)
 
 val space: Parser[Unit] =
-  for {
-    _ <- many(sat(_.isWhitespace))
-  } yield ()
+  many(sat(_.isWhitespace)).map(_ => ())
 
 def token[A](p: Parser[A]): Parser[A] =
   for {
