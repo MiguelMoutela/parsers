@@ -46,12 +46,8 @@ object Parsers {
   def space[F[_]: Parser: ParserError: SemigroupK]: F[Unit] =
     many(sat(_.isWhitespace, "whitespace")).map(_ => ())
 
-  def token[F[_]: Parser: ParserError: SemigroupK, A](p: F[A]): F[A] =
-    for {
-      _ <- space
-      t <- p
-      _ <- space
-    } yield t
+  def token[F[_]: Parser: ParserError: SemigroupK: Apply, A](p: F[A]): F[A] =
+    space *> p <* space
 
   def natural[F[_]: Parser: ParserError: SemigroupK]: F[Int] = token(nat)
 
